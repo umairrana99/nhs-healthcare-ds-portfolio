@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
+import pytest
 
 from readmission.constants import PATIENT_ID, TARGET_COLUMN
 from readmission.data import ingest
@@ -50,3 +53,38 @@ def test_build_dataset_end_to_end(raw_df: pd.DataFrame) -> None:
     # 3 survivors after cleaning: patients 100 (<30 ->1), 400 (>30 ->0), 500 (>30 ->0)
     assert len(result) == 3
     assert result[TARGET_COLUMN].sum() == 1
+
+
+def test_build_dataset_keeps_all_encounters_when_not_deduping(raw_df: pd.DataFrame) -> None:
+    result = ingest.build_dataset(raw_df, first_encounter_only=False)
+    # Death/hospice removed (4 rows left); patient 100 keeps both encounters.
+    assert len(result) == 4
+    assert (result[PATIENT_ID] == 100).sum() == 2
+
+
+def test_load_raw_converts_question_mark(tmp_path: Path) -> None:
+    csv = tmp_path / "diabetic_data.csv"
+    csv.write_text("encounter_id,race,readmitted\n1,?,NO\n2,Asian,<30\n", encoding="utf-8")
+    df = ingest.load_raw(csv)
+    assert df["race"].isna().sum() == 1
+    assert len(df) == 2
+
+
+def test_load_raw_missing_file_raises(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError):
+        ingest.load_raw(tmp_path / "does_not_exist.csv")
+
+
+def test_drop_expired_hospice_missing_column_raises() -> None:
+    with pytest.raises(KeyError):
+        ingest.drop_expired_hospice(pd.DataFrame({"x": [1]}))
+
+
+def test_binarize_target_missing_column_raises() -> None:
+    with pytest.raises(KeyError):
+        ingest.binarize_target(pd.DataFrame({"x": [1]}))
+
+
+def test_keep_first_encounter_missing_ids_raises() -> None:
+    with pytest.raises(KeyError):
+        ingest.keep_first_encounter_per_patient(pd.DataFrame({"x": [1]}))
