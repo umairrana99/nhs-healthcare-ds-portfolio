@@ -11,7 +11,7 @@ from readmission.data import ingest
 def test_replace_missing_tokens_converts_question_mark(raw_df: pd.DataFrame) -> None:
     cleaned = ingest.replace_missing_tokens(raw_df)
     assert cleaned.loc[cleaned["patient_nbr"] == 500, "race"].isna().all()
-    assert "?" not in cleaned["race"].to_numpy()
+    assert "?" not in cleaned["race"].dropna().to_numpy()
 
 
 def test_drop_expired_hospice_removes_death_and_hospice(raw_df: pd.DataFrame) -> None:

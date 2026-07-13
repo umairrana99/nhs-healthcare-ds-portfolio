@@ -51,9 +51,12 @@ def download_dataset(raw_dir: Path) -> Path:
     with urllib.request.urlopen(DATASET_URL) as response:  # noqa: S310 (trusted UCI host)
         archive_bytes = response.read()
 
-    with zipfile.ZipFile(io.BytesIO(archive_bytes)) as archive:
-        with archive.open(CSV_MEMBER) as member, target.open("wb") as out:
-            out.write(member.read())
+    with (
+        zipfile.ZipFile(io.BytesIO(archive_bytes)) as archive,
+        archive.open(CSV_MEMBER) as member,
+        target.open("wb") as out,
+    ):
+        out.write(member.read())
     logger.info("Extracted %s", target)
     return target
 
