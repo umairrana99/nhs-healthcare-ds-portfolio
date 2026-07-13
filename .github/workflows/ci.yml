@@ -1,0 +1,42 @@
+name: CI — 01 Hospital Readmission
+
+on:
+  push:
+    branches: [main]
+    paths: ["01-hospital-readmission/**", ".github/workflows/ci.yml"]
+  pull_request:
+    paths: ["01-hospital-readmission/**", ".github/workflows/ci.yml"]
+
+defaults:
+  run:
+    working-directory: 01-hospital-readmission
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install
+        run: python -m pip install -e ".[dev]"
+
+      - name: Ruff (lint)
+        run: python -m ruff check .
+
+      - name: Black (format check)
+        run: python -m black --check .
+
+      - name: MyPy (types)
+        run: python -m mypy
+
+      - name: Pytest
+        run: python -m pytest --cov=readmission --cov-report=term-missing
