@@ -1,15 +1,9 @@
-name: CI — 01 Hospital Readmission
+name: CI
 
 on:
   push:
     branches: [main]
-    paths: ["01-hospital-readmission/**", ".github/workflows/ci.yml"]
   pull_request:
-    paths: ["01-hospital-readmission/**", ".github/workflows/ci.yml"]
-
-defaults:
-  run:
-    working-directory: 01-hospital-readmission
 
 jobs:
   quality:
