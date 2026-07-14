@@ -49,7 +49,8 @@ line-length = 100
 target-version = ["py311"]
 
 [tool.mypy]
-python_version = "3.11"
+# Target the running interpreter (do not pin below 3.12 — recent numpy stubs use
+# PEP 695 `type` statements that a 3.11 target rejects).
 packages = ["readmission"]
 mypy_path = "src"
 strict = true
