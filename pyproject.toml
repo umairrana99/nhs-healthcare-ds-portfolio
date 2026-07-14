@@ -31,9 +31,12 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+readmission = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q --import-mode=importlib"
 pythonpath = ["src"]
 
 [tool.ruff]
@@ -56,3 +59,9 @@ mypy_path = "src"
 strict = true
 plugins = ["pydantic.mypy"]
 ignore_missing_imports = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    'if __name__ == "__main__":',
+]
