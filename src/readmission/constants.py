@@ -7,7 +7,7 @@ single place to document the leakage-prevention decisions from the design doc.
 from __future__ import annotations
 
 # Raw CSV encodes missing values as a literal "?".
-MISSING_TOKEN = "?"
+MISSING_TOKEN = "?"  # noqa: S105 — missing-value sentinel, not a credential
 
 # Identifier columns. ``patient_nbr`` is critical: a patient recurs across many
 # encounters, so any train/test split MUST group on it to avoid leakage.

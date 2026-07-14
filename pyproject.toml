@@ -45,7 +45,11 @@ target-version = "py311"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM"]
+select = ["E", "F", "I", "UP", "B", "SIM", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+# assert is idiomatic and safe in tests
+"tests/**" = ["S101"]
 
 [tool.black]
 line-length = 100
