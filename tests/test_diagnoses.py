@@ -45,6 +45,11 @@ def test_add_diagnosis_groups_adds_columns() -> None:
     assert "diag_1_group" not in df.columns
 
 
+def test_group_icd9_empty_string_is_missing() -> None:
+    assert diagnoses.group_icd9("") == "Missing"
+    assert diagnoses.group_icd9("   ") == "Missing"
+
+
 def test_all_outputs_are_declared_groups() -> None:
     for code in ["410", "250", "V1", "abc", pd.NA, "999"]:
         assert diagnoses.group_icd9(code) in diagnoses.DIAGNOSIS_GROUPS

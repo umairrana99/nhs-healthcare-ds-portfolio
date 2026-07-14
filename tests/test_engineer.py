@@ -57,3 +57,10 @@ def test_engineer_features_is_non_mutating_and_complete() -> None:
         assert col in out.columns
     # Original untouched.
     assert "total_prior_visits" not in df.columns
+
+
+def test_age_midpoint_handles_missing_and_malformed() -> None:
+    out = engineer.add_age_midpoint(pd.DataFrame({"age": ["[70-80)", None, "unknown"]}))
+    vals = out["age_midpoint"].tolist()
+    assert vals[0] == 75.0
+    assert pd.isna(vals[1]) and pd.isna(vals[2])
