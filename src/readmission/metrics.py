@@ -35,3 +35,28 @@ def expected_calibration_error(
         accuracy = float(truth[mask].mean())
         ece += (count / total) * abs(accuracy - confidence)
     return ece
+
+
+def net_benefit(
+    y_true: npt.NDArray[Any],
+    y_prob: npt.NDArray[Any],
+    *,
+    thresholds: npt.NDArray[Any] | None = None,
+) -> dict[str, npt.NDArray[Any]]:
+    """Decision-curve net benefit across probability thresholds.
+
+    ``NB(pt) = TP/n - FP/n * pt/(1-pt)`` — weighs true positives against false
+    positives at the clinician's threshold probability, answering "is acting on
+    this model better than treat-all / treat-none?".
+    """
+    truth = np.asarray(y_true, dtype=float)
+    prob = np.asarray(y_prob, dtype=float)
+    grid = np.linspace(0.01, 0.99, 99) if thresholds is None else np.asarray(thresholds, float)
+    total = len(truth)
+    benefits = np.empty(len(grid))
+    for i, threshold in enumerate(grid):
+        predicted = prob >= threshold
+        tp = float(np.sum(predicted & (truth == 1)))
+        fp = float(np.sum(predicted & (truth == 0)))
+        benefits[i] = tp / total - fp / total * (threshold / (1.0 - threshold))
+    return {"threshold": grid, "net_benefit": benefits}
