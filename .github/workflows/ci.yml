@@ -33,4 +33,4 @@ jobs:
         run: python -m mypy
 
       - name: Pytest
-        run: python -m pytest --cov=readmission --cov-report=term-missing
+        run: python -m pytest --cov=readmission --cov-report=term-missing --cov-fail-under=90

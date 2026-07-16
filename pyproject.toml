@@ -31,9 +31,12 @@ dev = [
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+readmission = ["py.typed"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q"
+addopts = "-q --import-mode=importlib"
 pythonpath = ["src"]
 
 [tool.ruff]
@@ -42,7 +45,11 @@ target-version = "py311"
 src = ["src", "tests"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "SIM"]
+select = ["E", "F", "I", "UP", "B", "SIM", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+# assert is idiomatic and safe in tests
+"tests/**" = ["S101"]
 
 [tool.black]
 line-length = 100
@@ -56,3 +63,9 @@ mypy_path = "src"
 strict = true
 plugins = ["pydantic.mypy"]
 ignore_missing_imports = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    'if __name__ == "__main__":',
+]
