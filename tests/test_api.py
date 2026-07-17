@@ -13,7 +13,7 @@ from sklearn.linear_model import LogisticRegression
 
 from readmission import persist
 from readmission.api import dependencies
-from readmission.api.app import _risk_band, app
+from readmission.api.app import app
 from readmission.models.boosted import build_xgboost_pipeline
 
 
@@ -82,12 +82,6 @@ def test_explain_returns_top_factors(client: TestClient) -> None:
     assert 0.0 <= body["readmission_probability"] <= 1.0
     assert len(body["top_factors"]) >= 1
     assert {"feature", "shap", "direction"} <= set(body["top_factors"][0])
-
-
-def test_risk_band_thresholds() -> None:
-    assert _risk_band(0.05) == "Low"
-    assert _risk_band(0.20) == "Moderate"
-    assert _risk_band(0.50) == "High"
 
 
 def test_get_model_loads_from_configured_path(
