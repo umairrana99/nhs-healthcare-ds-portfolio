@@ -7,6 +7,8 @@ real (licensed) dataset on disk.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -52,9 +54,10 @@ def _synthetic_raw() -> pd.DataFrame:
     )
 
 
-def test_main_runs_end_to_end(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_main_compares_models_and_saves(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     monkeypatch.setattr(train, "load_raw", lambda _path: _synthetic_raw())
-    metrics = train.main()
-    assert {"auroc_mean", "auprc_mean", "n_splits"}.issubset(metrics)
-    assert 0.0 <= metrics["auroc_mean"] <= 1.0
-    assert 0.0 <= metrics["auprc_mean"] <= 1.0
+    monkeypatch.setenv("READMISSION_MODEL_PATH", str(tmp_path / "model.joblib"))
+    comparison = train.main()
+    assert set(comparison) == {"logreg", "xgboost"}
+    assert 0.0 <= comparison["xgboost"]["auroc_mean"] <= 1.0
+    assert (tmp_path / "model.joblib").exists()

@@ -22,12 +22,14 @@ class Settings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         extra="ignore",
+        protected_namespaces=(),
     )
 
     # --- Paths ---
     project_root: Path = _PROJECT_ROOT
     raw_data_path: Path = _PROJECT_ROOT / "data" / "raw" / "diabetic_data.csv"
     processed_data_dir: Path = _PROJECT_ROOT / "data" / "processed"
+    model_path: Path = _PROJECT_ROOT / "models" / "model.joblib"
 
     # --- Reproducibility ---
     random_seed: int = 42

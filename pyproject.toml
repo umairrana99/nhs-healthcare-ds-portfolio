@@ -17,6 +17,9 @@ dependencies = [
     "xgboost>=2.0",
     "lightgbm>=4.0",
     "shap>=0.44",
+    "fastapi>=0.110",
+    "uvicorn>=0.30",
+    "joblib>=1.3",
     "pydantic>=2.6",
     "pydantic-settings>=2.2",
 ]
@@ -29,6 +32,7 @@ dev = [
     "black>=24.0",
     "mypy>=1.10",
     "pre-commit>=3.7",
+    "httpx>=0.27",
 ]
 
 [tool.setuptools.packages.find]
@@ -44,6 +48,8 @@ pythonpath = ["src"]
 filterwarnings = [
     # LightGBM's sklearn wrapper warns when features arrive as a numpy array; harmless here.
     "ignore:X does not have valid feature names:UserWarning",
+    # Starlette's TestClient deprecation notice about httpx; not relevant to our tests.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated",
 ]
 
 [tool.ruff]
