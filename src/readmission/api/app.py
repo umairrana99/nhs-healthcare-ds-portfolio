@@ -6,7 +6,7 @@ from typing import Annotated, Any
 
 from fastapi import Depends, FastAPI
 
-from readmission import explain
+from readmission import service
 from readmission.api.dependencies import get_model
 from readmission.api.schemas import (
     ExplanationResponse,
@@ -14,19 +14,10 @@ from readmission.api.schemas import (
     PatientRecord,
     PredictionResponse,
 )
-from readmission.preprocess import select_model_frame
 
 app = FastAPI(title="Hospital Readmission Prediction API", version="0.1.0")
 
 Model = Annotated[Any, Depends(get_model)]
-
-
-def _risk_band(probability: float) -> str:
-    if probability < 0.10:
-        return "Low"
-    if probability < 0.30:
-        return "Moderate"
-    return "High"
 
 
 @app.get("/health")
@@ -37,19 +28,16 @@ def health() -> dict[str, str]:
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(record: PatientRecord, model: Model) -> PredictionResponse:
-    """Return the calibrated 30-day readmission probability and a risk band."""
-    frame = select_model_frame(record.to_frame())
-    probability = float(model.predict_proba(frame)[0, 1])
+    """Return the 30-day readmission probability and a risk band."""
+    result = service.score(model, record)
     return PredictionResponse(
-        readmission_probability=probability, risk_band=_risk_band(probability)
+        readmission_probability=result["probability"], risk_band=result["risk_band"]
     )
 
 
 @app.post("/explain", response_model=ExplanationResponse)
 def explain_prediction(record: PatientRecord, model: Model) -> ExplanationResponse:
     """Return the prediction plus the top SHAP feature contributions."""
-    frame = select_model_frame(record.to_frame())
-    probability = float(model.predict_proba(frame)[0, 1])
-    contributions = explain.top_contributions(model, frame, top_k=5)[0]
-    factors = [FeatureContribution(**contribution) for contribution in contributions]
-    return ExplanationResponse(readmission_probability=probability, top_factors=factors)
+    result = service.score(model, record)
+    factors = [FeatureContribution(**contribution) for contribution in result["top_factors"]]
+    return ExplanationResponse(readmission_probability=result["probability"], top_factors=factors)
