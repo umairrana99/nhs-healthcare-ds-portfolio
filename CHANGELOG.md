@@ -16,9 +16,19 @@ and the project aims to adhere to [Semantic Versioning](https://semver.org/spec/
   medication complexity, A1C/glucose ordinals, age midpoint.
 - Feature schema + `ColumnTransformer` preprocessing pipeline.
 - Leakage-safe `StratifiedGroupKFold` cross-validation grouped on `patient_nbr`.
-- Baseline class-weighted Logistic Regression pipeline with grouped-CV evaluation
-  (AUROC / AUPRC) and a `python -m readmission.train` entry point.
-- Tooling: Ruff, Black, MyPy (strict), Pytest, pre-commit, GitHub Actions CI
-  (Python 3.11 & 3.12), `py.typed` marker, 100% test coverage (90% CI floor).
+- Baseline class-weighted Logistic Regression plus XGBoost and LightGBM pipelines.
+- Probability calibration and calibration metrics (Brier score, Expected Calibration Error).
+- Grouped-CV evaluation (AUROC / AUPRC) with a model-comparison helper.
+- SHAP explanations (per-patient contributions and global importance).
+- Decision-curve (net-benefit) analysis.
+- Model persistence (joblib) and a `python -m readmission.train` entry point that
+  compares models and saves the served model.
+- FastAPI service (`/health`, `/predict`, `/explain`) and a Streamlit dashboard,
+  sharing one scoring service.
+- Data-drift monitoring (Population Stability Index) and optional MLflow tracking.
+- Docker and docker-compose setup for the API and dashboard.
+- Tooling: Ruff (incl. security rules), Black, MyPy (strict), Pytest, pre-commit,
+  GitHub Actions CI (Python 3.11 & 3.12), `py.typed` marker, 100% test coverage
+  (90% CI floor).
 
 [Unreleased]: https://github.com/umairrana99/nhs-healthcare-ds-portfolio
