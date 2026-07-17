@@ -1,0 +1,21 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro
+    environment:
+      - READMISSION_MODEL_PATH=/app/models/model.joblib
+
+  dashboard:
+    build: .
+    command: >
+      streamlit run src/readmission/dashboard.py
+      --server.port 8501 --server.address 0.0.0.0
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./models:/app/models:ro
+    environment:
+      - READMISSION_MODEL_PATH=/app/models/model.joblib
